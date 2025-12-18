@@ -1,0 +1,125 @@
+## 1) Assignment statement form
+
+```text
+LHS = RHS
+```
+
+* **LHS (Left Hand Side)**: an *assignment target* (something you can store into), e.g. a name, subscript, attribute, unpacking pattern.
+* **RHS (Right Hand Side)**: an *expression* whose value is computed first, then stored into LHS.
+
+```text
+variable_name = expression
+```
+
+* `variable_name` → **LHS target**
+* `expression` → **RHS value-producing expression**
+
+---
+
+## 2) What is an expression?
+
+```text
+expression:
+    Valid combination of operators and operands is an expression.
+```
+
+* **Operand**: data/value (like `L`, `i`, numbers, variables, function results)
+* **Operator**: acts on operands (`+`, `*`, `[]`, `()`, etc.)
+* “Valid combination” means it obeys the language’s rules.
+
+```text
+    Basis for validity?
+        1) Ary of operator
+        2) Prefix/Infix/Postfix
+        3) Relative Precedence
+        4) Associativity
+```
+
+### 1) Ary of operator (Arity)
+
+* How many operands an operator needs.
+
+  * **Unary**: 1 operand (e.g. `-x`, `x[index]` is treated as unary on the left operand)
+  * **Binary**: 2 operands (e.g. `x + y`)
+  * **Ternary**: 3-part form (Python has `a if cond else b`)
+
+### 2) Prefix / Infix / Postfix
+
+* **Prefix**: operator before operand (`-x`, `not x`)
+* **Infix**: operator between operands (`x + y`)
+* **Postfix**: operator after/attached to the operand (`x[i]`, `f()`)
+
+### 3) Relative precedence
+
+* Decides which operator binds tighter when multiple appear.
+
+  * Example idea: `*` binds tighter than `+`.
+  * For `[]` vs assignment: `[]` binds tighter.
+
+### 4) Associativity
+
+* When precedence is the same, associativity decides grouping direction.
+
+  * **Left associative**: group left-to-right (`a - b - c` → `(a - b) - c`)
+  * **Right associative**: group right-to-left (some operators in some languages)
+
+---
+
+## 3) Slice/subscript form as an expression
+
+```text
+L[i:j:k]
+```
+
+This is **subscription/slicing** applied to `L`.
+
+```text
+L -> Operand
+i, j, k -> Operand
+```
+
+* `L` is the main operand being indexed/sliced.
+* `i`, `j`, `k` are operands used as **slice components**:
+
+  * `i` = start
+  * `j` = stop
+  * `k` = step
+    (Any of these can be omitted in real code, but here all three are shown.)
+
+---
+
+## 4) The operator being used: SUBSCRIPT
+
+```text
+SUBSCRIPT
+    UNARY POSTFIX OPERATOR
+```
+
+* `[]` is the **subscript (subscription) operator**.
+* It behaves like a **postfix** operator because it comes *after* the left operand: `L[...]`.
+* It is often described as **unary** in the sense that it primarily *attaches to one left operand* (`L`) and uses the bracket content as its indexing argument(s).
+
+```text
+    ITS LEFT ASSOCIATIVE
+```
+
+* **Left associative** grouping idea:
+
+  * `a[b][c]` groups as `(a[b])[c]`
+
+```text
+    PRECEDENCE IS GREATER THAN ASSIGNMENT
+```
+
+* `L[i:j:k]` is evaluated **before** the assignment happens.
+
+---
+
+## 5) Putting it together in an assignment
+
+```text
+    L1 = L[i:j:k]
+```
+
+* **RHS**: `L[i:j:k]` (compute the slice first)
+* **LHS**: `L1` (store the computed result into `L1`)
