@@ -1,0 +1,169 @@
+Below is your **entire code**, grouped into logical blocks, with the **concept** behind each block. **All lines are covered.**
+
+---
+
+## 1) Function definition: “Find all occurrences of an element in a list”
+
+**Concept:** We write a reusable function that returns a list of indices where a given `element` appears in list `L`.
+
+```python
+def find_all_occurrences(L: list, element: any) -> list[int]:
+```
+
+* **Concept:** Function header
+
+  * `L: list` → input list
+  * `element: any` → value to search (can be any type)
+  * `-> list[int]` → function returns a list of integer indices
+
+```python
+    index_list = []
+```
+
+* **Concept:** Output accumulator
+  Stores all found indices.
+
+```python
+    start_index = 0
+```
+
+* **Concept:** “Search-from” pointer
+  Tells `index()` where to start searching next.
+
+```python
+    current_index = 0
+```
+
+* **Concept:** Temporary variable
+  Holds the latest found index before we store it.
+
+---
+
+## 2) Loop to keep searching until the element is no longer found
+
+**Concept:** Keep finding the next occurrence, store its index, then move forward.
+
+```python
+    while element in L[start_index : len(L)]:
+```
+
+* **Concept:** Membership test on a slice (sub-list)
+
+  * `L[start_index : len(L)]` → remaining portion of the list
+  * `element in ...` → checks if element is still present ahead
+  * Loop continues until no more occurrences exist.
+
+```python
+        current_index = L.index(element, start_index)
+```
+
+* **Concept:** Locate next occurrence
+  `L.index(element, start_index)` returns the first index of `element` starting from `start_index`.
+
+```python
+        index_list.append(current_index)
+```
+
+* **Concept:** Store result
+  Save the found index into the list.
+
+```python
+        start_index = current_index + 1
+```
+
+* **Concept:** Move search window forward
+  Next search begins after the current match, preventing infinite repeat of the same index.
+
+```python
+    return index_list
+```
+
+* **Concept:** Final output
+  Return the list of all indices.
+
+---
+
+## 3) Input data setup
+
+**Concept:** A list with repeated values (10, 20, 30, etc.), used for testing.
+
+```python
+L = [10, 20, 30, 10, 20, 40, 20, 10, 30, 50, 60, 30, 20, 40]
+```
+
+---
+
+## 4) Calling the function for different elements
+
+**Concept:** Reuse the same function for multiple search values.
+
+```python
+all_indices_20 = find_all_occurrences(L, 20)
+all_indices_10 = find_all_occurrences(L, 10)
+all_indices_30 = find_all_occurrences(L, 30)
+all_indices_40 = find_all_occurrences(L, 40)
+all_indices_50 = find_all_occurrences(L, 50)
+all_indices_60 = find_all_occurrences(L, 60)
+```
+
+* **Concept:** Function reuse + storing results
+  Each variable stores all indices where that value occurs.
+
+---
+
+## 5) Printing the list with indices (manual indexing loop)
+
+**Concept:** Use a `while` loop to print each index and its value.
+
+```python
+i = 0
+```
+
+* **Concept:** Loop counter initialization
+
+```python
+while i < len(L):
+```
+
+* **Concept:** Loop condition
+  Runs from `i = 0` to `i = len(L)-1`.
+
+```python
+    print(i, L[i], sep='\t')
+```
+
+* **Concept:** Indexing + formatted output
+
+  * `L[i]` → element at index `i`
+  * `sep='\t'` → prints index and value separated by a tab
+
+```python
+    i = i + 1 
+```
+
+* **Concept:** Counter increment
+  Moves to next index.
+
+---
+
+## 6) Printing the final computed results
+
+**Concept:** Display all occurrences (index lists) collected earlier.
+
+```python
+print('All indices for data value 10:', all_indices_10)
+print('All indices for data value 20:', all_indices_20)
+print('All indices for data value 30:', all_indices_30)
+print('All indices for data value 40:', all_indices_40)
+print('All indices for data value 50:', all_indices_50)
+print('All indices for data value 60:', all_indices_60)
+```
+
+* **Concept:** Result reporting
+  Shows which indices each data value appears at.
+
+---
+
+### What this program demonstrates (in one line)
+
+**Concept summary:** *“Use `index(value, start)` repeatedly with a moving start position to collect all matching indices.”*
