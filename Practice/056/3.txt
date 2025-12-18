@@ -1,0 +1,168 @@
+Below is your code **grouped by purpose**, with the **concept behind each group**, and **every line covered**.
+
+---
+
+## 1) Class header: “an iterator that produces squares”
+
+```py
+class Gensquare:
+```
+
+**Concept**
+
+* You’re defining a custom type whose objects will generate square numbers.
+* The intention (confirmed by later methods) is: **the object itself is an iterator** (not just an iterable).
+
+---
+
+## 2) Constructor: store `N` + create an internal generator object
+
+```py
+    def __init__(self, N):
+        self.N = N
+```
+
+**Concept**
+
+* `__init__` runs when you create `Gensquare(8)`.
+* `self.N = N` stores the limit so the object “remembers” how many squares to produce.
+
+---
+
+### 2.1) Nested generator function: defines *how* to produce squares
+
+```py
+        def get_generator(N):
+            for i in range(N):
+                yield i ** 2
+```
+
+**Concept**
+
+* `get_generator` is a **generator function** (because it contains `yield`).
+* Calling it does **not** compute everything at once; it returns a **generator object** that produces values lazily.
+* `for i in range(N)` generates `i = 0, 1, 2, ..., N-1`.
+* `yield i ** 2` produces each square one-by-one: `0, 1, 4, 9, ...`.
+
+---
+
+### 2.2) Create and store the generator object (this is the “consume semantics” part)
+
+```py
+        self.G = get_generator(self.N)
+```
+
+**Concept**
+
+* Here you are creating **one generator object** and storing it in `self.G`.
+* A generator object is an **iterator** that gets **consumed** as you iterate.
+* Once it is exhausted, it stays exhausted (unless you create a new generator object).
+
+---
+
+## 3) Make the object follow the iterator protocol
+
+### 3.1) `__iter__`: returns the iterator object
+
+```py
+    def __iter__(self):
+        return self
+```
+
+**Concept**
+
+* Iteration uses: `iter(obj)` → calls `obj.__iter__()`.
+* Returning `self` means:
+
+  * `Gensquare` objects are **iterators** (not just iterables),
+  * and they maintain internal state (here, the state is inside `self.G`).
+
+---
+
+### 3.2) `__next__`: produce the next value (or stop)
+
+```py
+    def __next__(self):
+        return self.G.__next__()
+```
+
+**Concept**
+
+* `next(obj)` calls `obj.__next__()`.
+* You delegate to the internal generator’s `__next__()`.
+* When the generator is finished, it raises **StopIteration**.
+* That StopIteration is what makes `for` loops stop naturally.
+
+> Note: `return next(self.G)` is equivalent and more idiomatic than `self.G.__next__()`.
+
+---
+
+## 4) Demo / Driver code: shows “consume semantics” in action
+
+```py
+print('Gensquare is an iterator which is implemented using consume semantics')
+print('Therefore we can iterator on its object only once')
+```
+
+**Concept**
+
+* These lines explain the key idea: since the object holds **one generator instance**, it can be consumed only once.
+
+---
+
+### 4.1) Create the iterator
+
+```py
+G = Gensquare(8)
+```
+
+**Concept**
+
+* This calls `__init__`, stores `N=8`, and creates **one** internal generator `self.G`.
+
+---
+
+### 4.2) First iteration (works)
+
+```py
+print('Iterating for the first time')
+for x in G:
+    print(x)
+```
+
+**Concept**
+
+* `for x in G` does roughly:
+
+  1. `it = iter(G)` → calls `G.__iter__()` → returns `G` itself
+  2. repeatedly `next(it)` → calls `G.__next__()` → which calls `self.G.__next__()`
+* Output will be squares from `0**2` to `7**2`:
+
+  * `0, 1, 4, 9, 16, 25, 36, 49`
+
+---
+
+### 4.3) Second iteration (prints nothing)
+
+```py
+print('Iterating for the second time')
+for x in G:
+    print(x)
+print('----SECOND TIME ITERATION OVER-----')
+```
+
+**Concept**
+
+* After the first loop, the internal generator `self.G` is **already exhausted**.
+* So the second `for` loop immediately hits StopIteration and runs **zero iterations**.
+* That’s why you see only the messages, not the numbers.
+
+---
+
+## Why it’s “only once” (the core reason)
+
+* Your object is an **iterator** (`__iter__` returns `self`)
+* It contains a **single generator object** (`self.G = get_generator(...)`)
+* Generator objects are **consumed** and cannot be restarted.
+
+If you want, I can also show a “re-iterable” version where `for x in G` works every time (by creating a fresh generator in `__iter__`).

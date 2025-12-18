@@ -1,0 +1,419 @@
+## Environment / IDLE banner (what you saw when you launched Python)
+
+```py
+Python 3.14.0 (tags/v3.14.0:ebf955d, Oct  7 2025, 10:15:03) [MSC v.1944 64 bit (AMD64)] on win32
+Enter "help" below or click "Help" above for more information.
+```
+
+**Concept**
+
+* You’re in the **interactive Python shell (IDLE)**: you type statements/expressions and immediately see results/errors.
+
+---
+
+## Dictionary Data Type — In Depth Study
+
+### Step 1: Ways of creation
+
+#### Way 1: Special syntax (dictionary literal `{key: value, ...}`)
+
+```py
+# Dictionary Data Type - In Depth Study
+# Step 1: Ways of creation
+# Way 1: Special Syntax:
+D1 = {'a' : 10, 'b' : 20, 'c' : 30}
+```
+
+**Concept**
+
+* A **dictionary** maps **keys → values**.
+* **Keys must be immutable / hashable** (e.g., `int`, `float`, `str`, `tuple`, `bool`, etc.).
+* **Values can be anything** (mutable/immutable).
+
+```py
+# Key of dictionary can be any immutable object
+D2 = {True:100, 10:200, 1.1:300, "Hello":400, (-1,-2,-3):500}
+v1 = D2[True] # v1 == 100
+v2 = D2[10]     # v2 = 200
+v3 = D2[1.1]    # v3 == 300
+v4 = D2["Hello"] # v4 == 400
+v5 = D2[(-1, -2, -3)] # v5 == 500
+print(v1, v2, v3, v4, v5)
+100 200 300 400 500
+```
+
+**Concept**
+
+* `D2[key]` is the **subscript operator** for lookup.
+* If the key exists → returns value; if not → raises `KeyError`.
+
+---
+
+#### Way 2: Constructor syntax `dict(...)`
+
+##### Version 1: keyword-argument style
+
+```py
+# Way 2: Constructor Syntax
+# Version 1
+D3 = dict(p=1.1, q=2.2, r=3.3)
+print(D3)
+{'p': 1.1, 'q': 2.2, 'r': 3.3}
+```
+
+**Concept**
+
+* `dict(p=1.1, ...)` creates keys as **strings**: `'p'`, `'q'`, `'r'`.
+* Keys must look like valid Python identifiers in this form.
+
+---
+
+##### Version 2: build from two containers using `zip()` + `dict()`
+
+```py
+# Version 2: When all keys are present in one container and all values are present in another container
+L1 = ['a', 'b', 'c', 'd']
+L2 = [1000, 2000, 3000, 4000]
+z = zip(L1, L2)
+type(z)
+<class 'zip'>
+print(z)
+<zip object at 0x0000012FE8CF97C0>
+for t in z:
+    print(t, type(t))
+
+    
+('a', 1000) <class 'tuple'>
+('b', 2000) <class 'tuple'>
+('c', 3000) <class 'tuple'>
+('d', 4000) <class 'tuple'>
+```
+
+**Concept**
+
+* `zip(L1, L2)` produces an **iterator** of 2-tuples: `(key, value)`.
+* Printing `z` shows a **zip object** with an address (that address is specific to that run).
+* After looping once, `z` is **exhausted** (consumed), so you recreated it:
+
+```py
+z = zip(L1, L2)
+D = dict(z)
+D
+{'a': 1000, 'b': 2000, 'c': 3000, 'd': 4000}
+```
+
+**Concept**
+
+* `dict(iterable_of_pairs)` converts pairs into a dictionary.
+
+You also did it in one line:
+
+```py
+D = dict(zip(['a', 'b', 'c', 'd'], [1000, 200, 300, 400]))
+D
+{'a': 1000, 'b': 200, 'c': 300, 'd': 400}
+```
+
+---
+
+#### Way 3: `dict.fromkeys(...)` (static/class method)
+
+```py
+# Way 3: There is static method named 'fromkeys' in class 'dict'
+D = dict.fromkeys(['a', 'b', 'c', 'd'])
+print(D)
+{'a': None, 'b': None, 'c': None, 'd': None}
+```
+
+**Concept**
+
+* Creates dictionary with given keys and **same default value** for all.
+* Default value is `None` if not provided.
+
+```py
+D = dict.fromkeys(['a', 'b', 'c', 'd'], 0)
+D
+{'a': 0, 'b': 0, 'c': 0, 'd': 0}
+D = dict.fromkeys(['a', 'b', 'c', 'd'], 8)
+D
+{'a': 8, 'b': 8, 'c': 8, 'd': 8}
+```
+
+---
+
+#### Way 4: Dictionary comprehension (mentioned, but you hit a syntax error)
+
+```py
+@# way 4: Dictionary Comprehension (to be covered at the time of functional programming)
+SyntaxError: invalid syntax
+```
+
+**Concept**
+
+* The `@` at the start makes it invalid Python syntax.
+* Correct “comment-only” line would be: `# way 4: Dictionary Comprehension ...`
+* Actual dictionary comprehension syntax looks like:
+
+  * `{k: v for (k, v) in iterable}` (example only; you said you’ll cover later)
+
+```py
+#-----------------------------------------------------------------------------
+```
+
+---
+
+### Step 2: Operators on dictionary
+
+#### 1) Subscript operator `D[key]`
+
+```py
+# Step 2: Operators on dictionary
+# Subscript operator
+D = {'a':10, 'b':20, 'c':30}
+v = D['a']
+print(v)
+10
+```
+
+**Concept**
+
+* Fetch value using a key.
+
+#### 2) Membership testing `in` (checks **keys**, not values)
+
+```py
+# Membership testing operator for keys (not for values)
+'a' in D
+True
+10 in D
+False
+```
+
+**Concept**
+
+* `'a' in D` → checks if `'a'` is a **key**.
+* `10 in D` → checks if key `10` exists (not whether value 10 exists).
+
+---
+
+### Step 3: Built-in functions on dict
+
+```py
+# Step 3: Built in functions
+D = {'a': 10, 'b': 20, 'c': 30}
+print(D)
+{'a': 10, 'b': 20, 'c': 30}
+len(D)
+3
+id(D)
+1305283890624
+>>> type(D)
+<class 'dict'>
+```
+
+**Concept**
+
+* `print(D)` shows contents.
+* `len(D)` gives number of key-value pairs.
+* `id(D)` gives identity/address-like number for that object (varies per run).
+* `type(D)` confirms the object type is `dict`.
+
+---
+
+### Step 4: Class methods (dictionary “views”)
+
+#### 1) Dictionary views: `keys()`, `values()`, `items()`
+
+```py
+>>> # Step 4: Class methods
+>>> # Dictionary views: 1) Key view, 2) Value view, 3) Item views
+>>> D = {'a' : 10, 'b' : 20, 'c' : 30, 'd' : 40}
+>>> K = D.keys()
+>>> V = D.values()
+>>> I = D.items()
+>>> type(K)
+<class 'dict_keys'>
+>>> type(V)
+<class 'dict_values'>
+>>> type(I)
+<class 'dict_items'>
+>>> print(K)
+dict_keys(['a', 'b', 'c', 'd'])
+>>> print(V)
+dict_values([10, 20, 30, 40])
+>>> print(I)
+dict_items([('a', 10), ('b', 20), ('c', 30), ('d', 40)])
+```
+
+**Concept**
+
+* These are **view objects** (not lists).
+* They are iterable and reflect dictionary content.
+
+---
+
+#### Iterating over keys / values / items
+
+```py
+>>> for k in D.keys():
+...     print(k)
+... 
+...     
+a
+b
+c
+d
+>>> for v in D.values():
+...     print(v)
+... 
+...     
+10
+20
+30
+40
+>>> for t in D.items():
+    print(t)
+
+    
+('a', 10)
+('b', 20)
+('c', 30)
+('d', 40)
+```
+
+**Concept**
+
+* `items()` yields `(key, value)` tuples.
+
+---
+
+### Extra iteration practice shown (lists and tuple-unpacking)
+
+#### Iterating a normal list
+
+```py
+L = [10, 20, 30, 40]
+for x in L:
+    print(x)
+
+    
+10
+20
+30
+40
+```
+
+#### List containing a tuple (still prints the tuple as one element)
+
+```py
+L = [10, 20, (30, 40), 50]
+for x in L:
+    print(x)
+
+    
+10
+20
+(30, 40)
+50
+```
+
+#### List of tuples + examining tuple properties
+
+```py
+L = [(10, 20, 30), (40, 50, 60), (70, 80, 90), (100, 110, 120)]
+for t in L:
+    print(t, type(t), len(t))
+
+    
+(10, 20, 30) <class 'tuple'> 3
+(40, 50, 60) <class 'tuple'> 3
+(70, 80, 90) <class 'tuple'> 3
+(100, 110, 120) <class 'tuple'> 3
+```
+
+**Concept**
+
+* Each element `t` is a tuple of length 3.
+
+#### Tuple unpacking directly in the loop header
+
+```py
+for (x, y, z) in L:
+    print(x, y, z)
+
+    
+10 20 30
+40 50 60
+70 80 90
+100 110 120
+```
+
+**Concept**
+
+* Python unpacks each tuple into variables `x, y, z`.
+
+---
+
+### Unpacking `dict.items()` into `(key, value)`
+
+```py
+for (key, value) in D.items():
+    print(key, value)
+
+    
+a 10
+b 20
+c 30
+d 40
+```
+
+**Concept**
+
+* Each `t` from `D.items()` is a 2-tuple `(key, value)` so it can be unpacked.
+
+Variable names can be anything:
+
+```py
+for (kajol, twinkle) in D.items():
+    print(kajol, twinkle)
+
+    
+a 10
+b 20
+c 30
+d 40
+```
+
+---
+
+### Manual tuple unpacking + the typo error
+
+```py
+(key, value) = ('a', 10)
+key
+'a'
+value
+10
+```
+
+```py
+(key, value) = ('b', 20)
+key
+'b'
+v
+valye
+Traceback (most recent call last):
+  File "<pyshell#101>", line 1, in <module>
+    valye
+NameError: name 'valye' is not defined. Did you mean: 'value'?
+value
+20
+```
+
+**Concept**
+
+* `(key, value) = ('b', 20)` unpacks the tuple into two variables.
+* `valye` is a misspelling → `NameError`.
+* Python helpfully suggests `value`.
+
+---

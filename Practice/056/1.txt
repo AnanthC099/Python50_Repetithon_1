@@ -1,0 +1,155 @@
+Below is your **entire IDLE session**, grouped properly with the **concepts**, and **every line covered**.
+
+---
+
+## 1) Tuple unpacking (positional assignment)
+
+**Concept:** *Tuple positional assignment / unpacking*
+Rule: **Number of variables on LHS must match number of values on RHS**.
+
+```py
+>>> (a, b, c) = (10, 20, 30) # tuple positional assignment
+>>> a
+10
+>>> b
+20
+ 
+>>> c
+30
+```
+
+**What happened here:**
+
+* RHS tuple `(10, 20, 30)` has **3 values**
+* LHS `(a, b, c)` has **3 names**
+* Values are assigned position-wise:
+
+  * `a = 10`, `b = 20`, `c = 30`
+
+---
+
+## 2) List unpacking (positional assignment)
+
+**Concept:** *List unpacking / destructuring*
+Same unpacking rule: **count must match**.
+
+```py
+>>> [p, q, r] = [1.1, 2.2, 3.3]
+>>> p
+1.1
+>>> q
+2.2
+>>> r
+3.3
+```
+
+**What happened here:**
+
+* LHS has 3 variables: `p, q, r`
+* RHS list has 3 values: `1.1, 2.2, 3.3`
+* Assigned position-wise:
+
+  * `p=1.1`, `q=2.2`, `r=3.3`
+
+---
+
+## 3) Multiple assignment using comma-separated values
+
+**Concept:** *Multiple assignment / unpacking from an implicit tuple*
+When you write `u, v, w = True, False, True`, Python treats RHS as a tuple.
+
+```py
+>>> u, v, w = True, False, True
+>>> u
+True
+>>> v
+False
+>>> w
+True
+```
+
+**What happened here:**
+
+* LHS has 3 variables
+* RHS has 3 values
+* Works fine:
+
+  * `u=True`, `v=False`, `w=True`
+
+---
+
+## 4) Unpacking error: too many values (LHS smaller than RHS)
+
+**Concept:** *Unpacking must match exactly → otherwise ValueError*
+Case: RHS has **more** values than LHS variables.
+
+```py
+>>> u, v, w = 10, 20, 30, 40
+Traceback (most recent call last):
+  File "<pyshell#12>", line 1, in <module>
+    u, v, w = 10, 20, 30, 40
+ValueError: too many values to unpack (expected 3, got 4)
+```
+
+**Meaning:**
+
+* LHS expects **3** values (`u, v, w`)
+* RHS provides **4** values (`10, 20, 30, 40`)
+* So Python raises:
+
+  * `expected 3, got 4`
+
+---
+
+## 5) Unpacking error: too many values (again)
+
+**Concept:** *Same error type, different counts*
+
+```py
+>>> u, v = 10, 20, 30
+Traceback (most recent call last):
+  File "<pyshell#13>", line 1, in <module>
+    u, v = 10, 20, 30
+ValueError: too many values to unpack (expected 2, got 3)
+```
+
+**Meaning:**
+
+* LHS expects **2** values (`u, v`)
+* RHS provides **3** values (`10, 20, 30`)
+* Error:
+
+  * `expected 2, got 3`
+
+---
+
+## 6) Unpacking error: not enough values (LHS bigger than RHS)
+
+**Concept:** *RHS has fewer values than LHS expects → ValueError*
+Case: LHS variables are **more** than RHS values.
+
+```py
+>>> u, v, w, s = 10, 20
+Traceback (most recent call last):
+  File "<pyshell#14>", line 1, in <module>
+    u, v, w, s = 10, 20
+ValueError: not enough values to unpack (expected 4, got 2)
+```
+
+**Meaning:**
+
+* LHS expects **4** values (`u, v, w, s`)
+* RHS provides only **2** (`10, 20`)
+* Error:
+
+  * `expected 4, got 2`
+
+---
+
+### Core rule summary (the single key concept behind all lines)
+
+**Unpacking / positional assignment rule:**
+
+* **LHS count must match RHS count**, unless you use a starred target like `*rest` (not used in your code).
+
+If you want, I can extend this same note with the **star-unpacking fix** examples (like `u, v, *rest = 10, 20, 30, 40`).
