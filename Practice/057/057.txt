@@ -1,0 +1,349 @@
+## 0) Python/IDLE session header + topic
+
+```py
+Python 3.14.0 (tags/v3.14.0:ebf955d, Oct  7 2025, 10:15:03) [MSC v.1944 64 bit (AMD64)] on win32
+Enter "help" below or click "Help" above for more information.
+# Dictionary - In Depth Continued
+# How to add / modify / remove data from dictionary
+```
+
+**Concepts**
+
+* You’re working inside the interactive Python shell (IDLE-like REPL).
+* Topic: **mutating a dictionary** (add/modify/remove) and related dict methods.
+
+---
+
+## 1) Addition: add a new key-value pair using `D[new_key] = value`
+
+```py
+# 1) How to add a new key-value pair
+# General Format: D[New-Key] = New-Value
+D = {}
+print(D)
+{}
+# Dictionary is empty right now. Add key 'a' and value 10 pair
+D['a'] = 10
+print(D)
+{'a': 10}
+# To add 'b' : 20 pair, D['b
+# D['b'] = 20
+D['b'] = 20
+print(D)
+{'a': 10, 'b': 20}
+# Add : True : 1000
+D[True] = 1000
+print(D)
+{'a': 10, 'b': 20, True: 1000}
+```
+
+**Concepts**
+
+* `D = {}` creates an **empty dict**.
+* `D['a'] = 10` inserts a **new entry** because `'a'` didn’t exist.
+* Same for `'b'`.
+* `D[True] = 1000` shows keys can be any **hashable (immutable) object** (e.g., `bool`, `int`, `str`, `tuple`, etc.).
+  *Extra note:* `True` behaves like `1` as a key (because `True == 1`), so avoid mixing `True` and `1` as separate keys.
+
+---
+
+## 2) Modification: change value of an existing key using `D[existing_key] = new_value`
+
+```py
+# Modification:
+# Note: 1) You can modify the value of given key
+# 2) You cannot modify the key of given valye
+# General Format: D[existing_key] = value
+D = {'a' : 10, 'b' : 20, 'c' : 30, 'd' : 40}
+print(D)
+{'a': 10, 'b': 20, 'c': 30, 'd': 40}
+# Change value associated by key 'b' (from 20 to 200)
+D['b'] = 200
+print(D)
+{'a': 10, 'b': 200, 'c': 30, 'd': 40}
+# Change existing value 30 to 300 attached with key 'c'
+D['c'] = 300
+print(D)
+{'a': 10, 'b': 200, 'c': 300, 'd': 40}
+```
+
+**Concepts**
+
+* If the key already exists, `D[key] = value` **overwrites** the old value.
+* You cannot “edit a key in place”; you would **delete** the old key and **insert** a new key instead.
+
+---
+
+## 3) Deletion (single key): remove a key-value pair using `del D[key]`
+
+```py
+# 3) Deletion: How to remove a key value pair from dictionary
+# del D[existing_key]
+D = {'a' : 10, 'b' : 20, 'c' : 30, 'd' : 40}
+# Remove pair 'a' : 10 from dictionary
+del D['a']
+print(D)
+{'b': 20, 'c': 30, 'd': 40}
+# Remove / Delete 'd' : 40 pair from dictionary D
+del D['d']
+print(D)
+{'b': 20, 'c': 30}
+```
+
+**Concepts**
+
+* `del D[key]` removes the **entry**.
+* If the key doesn’t exist, `del D[key]` raises **KeyError** (strict behavior).
+
+---
+
+## 4) Summary: the 3 core mutation operations
+
+```py
+# Summary:
+# 1) Addition: D[new-key] = value
+# 2) Modification: D[existing-key] = value
+# 3) Removal: del D[existing-key]
+#-------------------------------------------
+# additional ways to remove key:value pair(s) from dictionary
+```
+
+**Concepts**
+
+* Same syntax `D[key] = value` does **insert-or-overwrite**.
+* Deletion uses `del`.
+
+---
+
+## 5) More removals: `popitem()` (removes and returns last inserted pair)
+
+```py
+# 1) method: popitem()
+D = {'a' : 10, 'b' : 20, 'c' : 30, 'd' : 40}
+print(D)
+{'a': 10, 'b': 20, 'c': 30, 'd': 40}
+returnValue = D.popitem()
+print(returnValue)
+('d', 40)
+# On empty dictionry, this method will trigger an exception
+D1 = {}
+type(D1)
+<class 'dict'>
+print(D1)
+{}
+D1.popitem()
+Traceback (most recent call last):
+  File "<pyshell#52>", line 1, in <module>
+    D1.popitem()
+KeyError: 'popitem(): dictionary is empty'
+```
+
+**Concepts**
+
+* `popitem()` removes **one** item and returns a **tuple** `(key, value)`.
+* In modern Python, it removes the **most recently inserted** item (LIFO).
+* On an empty dict, it raises **KeyError**.
+
+---
+
+## 6) More removals: `pop(key)` (removes by key and returns the value)
+
+```py
+# 2) method: pop()
+D = {'a' : 10, 'b' : 20, 'c' : 30, 'd' : 40, 'e' : 40}
+# The pop method is invoked on the dictionary. The pop method accepts a key from caller
+# If the key is not present -> raise KeyError exception
+# If the key is present -> Remove the key:value pair from the dictionary and return the value object
+# as a return value of pop() function
+n = D.pop('c')
+print(D)
+{'a': 10, 'b': 20, 'd': 40, 'e': 40}
+print(n)
+30
+```
+
+**Concepts**
+
+* `D.pop(key)` is **delete + return value** in one step.
+* Missing key ⇒ **KeyError** (unless you pass a default as second argument, not shown here).
+
+---
+
+## 7) Remove everything: `clear()` vs “wrong prevalent practice” `D = {}`
+
+```py
+# 3) clear() : To remove all key-value pairs from a dictionary -> you must invoke a clear function
+# WRONG PREVAILANT PRACTIVE: D = {}     -> will clear the dictionary
+# Technically speaking D = {} will cause python to allocate a new empty dictionary and assign it to
+# variable D. This causes variable D to give up its existing association with the current dictionary.
+# This is not equivalent to dropping all key:value pairs from a given dictionary
+D = {'a' : 10, 'b' : 20, 'c' : 30, 'd' : 40}
+id(D)
+1731250650944
+print(D)
+{'a': 10, 'b': 20, 'c': 30, 'd': 40}
+D.clear()
+id(D)
+1731250650944
+print(D)
+{}
+```
+
+**Concepts**
+
+* `D.clear()` empties the **same dictionary object** (same `id(D)` before and after).
+* `D = {}` would **rebind** the name `D` to a **new object** (important when multiple variables reference the same dict).
+
+---
+
+## 8) Introspection: `dir(dict)`
+
+```py
+dir(dict)
+['__class__', '__class_getitem__', '__contains__', '__delattr__', '__delitem__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getitem__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__ior__', '__iter__', '__le__', '__len__', '__lt__', '__ne__', '__new__', '__or__', '__reduce__', '__reduce_ex__', '__repr__', '__reversed__', '__ror__', '__setattr__', '__setitem__', '__sizeof__', '__str__', '__subclasshook__', 'clear', 'copy', 'fromkeys', 'get', 'items', 'keys', 'pop', 'popitem', 'setdefault', 'update', 'values']
+# ----------------------
+```
+
+**Concepts**
+
+* `dir(dict)` lists attributes/methods available on the **dict type** (class).
+
+---
+
+## 9) Fetching values: `D[key]` (strict) vs `D.get(key)` (lenient)
+
+```py
+# method: get() : Lenient version of subscript operator on RHS
+# Explanation: We use [] operator on dictionary in RHS sense in order to fetch a value associated with any
+# key. If the given key is not present in the dictionary then it raises a KeyError exception. If the key is pre# sent it returns the associated value
+D = {'a' : 10, 'b' : 20, 'c' : 30}
+v = D['b']
+print(v)
+20
+v = D['x']
+Traceback (most recent call last):
+  File "<pyshell#81>", line 1, in <module>
+    v = D['x']
+KeyError: 'x'
+# Analyse behaviour of get() method vis-a-vis [] operator on RHS
+v = D.get('b')
+print(v)
+20
+# For existing key: get() method behaved similar to [] operator on RHS
+v = D.get('x')
+print(v)
+None
+# For non-existent key: get() method returns None instead of triggering an exception
+D1 = {'x' : None}
+v = D1.get('x')
+print(v)
+None
+v = D1['x']
+print(v)
+None
+#----------------------
+```
+
+**Concepts**
+
+* `D['b']` returns the value for existing key.
+* `D['x']` raises **KeyError** if missing.
+* `D.get('x')` returns **None** if missing (no exception).
+* Important ambiguity: `get()` returning `None` might mean either:
+
+  * key is missing, **or**
+  * key exists and its value is actually `None` (shown by `D1 = {'x': None}`).
+
+---
+
+## 10) `setdefault()`: “get + insert if missing”
+
+```py
+# method : setdefault()
+# setdefault() function should be considered as a function in the lineage of [] operator on RHS and get()
+# method. We have already seen that the get() method is lenient version of [] operator on RHS in a sense that
+# get() function does not trigger an exception when presented with non-existent key but [] operator does.
+
+# setdefault() when presented with non-existent key will not only won't trigger an exception but will also
+# add non-existent key to the dictionary and attach value None with it and will return None
+
+D
+{'a': 10, 'b': 20, 'c': 30}
+# For existent key, [] operator on RHS, get() method and setdefault() method behave identically in that
+# they return the associated value
+
+D['b']
+20
+D.get('b')
+20
+D.setdefault('b')
+20
+
+# difference in behaviour when presented with non-existent key
+D['x']  # Ancient Indian Parent Like Behaviour
+Traceback (most recent call last):
+  File "<pyshell#114>", line 1, in <module>
+    D['x']  # Ancient Indian Parent Like Behaviour
+KeyError: 'x'
+>>> returnValue = D.get('x') # 80's Indian parent
+>>> 
+>>> v = D.setdefault('x')
+>>> D
+{'a': 10, 'b': 20, 'c': 30, 'x': None}
+>>> v = D.setdefault('y', 100)
+>>> D
+{'a': 10, 'b': 20, 'c': 30, 'x': None, 'y': 100}
+>>> v
+100
+>>> D
+{'a': 10, 'b': 20, 'c': 30, 'x': None, 'y': 100}
+>>> D.setdefault('b', 500)
+20
+>>> D
+{'a': 10, 'b': 20, 'c': 30, 'x': None, 'y': 100}
+>>> D.setdefault('z', 40)
+40
+>>> D
+{'a': 10, 'b': 20, 'c': 30, 'x': None, 'y': 100, 'z': 40}
+>>> D.setdefault('w', 10)
+10
+>>> D
+{'a': 10, 'b': 20, 'c': 30, 'x': None, 'y': 100, 'z': 40, 'w': 10}
+>>> # method: update() -> Dictionary's version of concatenation
+```
+
+**Concepts**
+
+* For an **existing key**: `D.setdefault('b')` behaves like `D.get('b')` and returns the existing value.
+* For a **missing key**:
+
+  * `D.setdefault('x')` **inserts** `'x': None` and returns `None`.
+  * `D.setdefault('y', 100)` inserts `'y': 100` and returns `100`.
+* If the key exists, the default is **ignored**: `D.setdefault('b', 500)` returns existing `20` and does not overwrite.
+
+---
+
+## 11) `update()`: merge dictionaries (conflicts overwritten by the incoming dict)
+
+```py
+>>> D1 = {'a' : 10, 'b' : 20, 'c' : 30}
+>>> D2 = {'c' : 300, 'd' : 400, 'e' : 500}
+>>> D1.update(D2)
+>>> D1
+{'a': 10, 'b': 20, 'c': 300, 'd': 400, 'e': 500}
+>>> D1 = {'a' : 10, 'b' : 20, 'c' : 30}
+>>> D2 = {'c' : 300, 'd' : 400, 'e' : 500}
+>>> D2.update(D1)
+>>> D2
+{'c': 30, 'd': 400, 'e': 500, 'a': 10, 'b': 20}
+>>> #----------------------------------------------------------------
+```
+
+**Concepts**
+
+* `D1.update(D2)` copies entries from `D2` into `D1`.
+
+  * If a key overlaps (`'c'`), the value in `D1` becomes the value from `D2` (30 → 300).
+* `D2.update(D1)` does the reverse: now `'c'` becomes 30 (because `D1` overwrote it).
+
+If you want, I can convert this same grouped content into a **.txt** file format exactly like your previous request (no extra text, just clean headings + grouped blocks).
