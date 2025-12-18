@@ -1,0 +1,381 @@
+Below is your code **grouped into logical blocks**, with the **concept behind each block**, and **every line covered**.
+
+---
+
+## A) `get_word_count()` helper (counts words in one string/line)
+
+### Group A1 — Function header + type hint
+
+```py
+def get_word_count(s:str) -> int:
+```
+
+**Concept:**
+Defines a function that takes `s` (expected to be a `str`) and returns an `int` (word count). Type hints are for readability/tools; Python won’t enforce them automatically.
+
+---
+
+### Group A2 — Input validation (defensive programming)
+
+```py
+    if type(s) is not str:
+        return -1
+```
+
+**Concept:**
+Rejects non-string input. Returning `-1` is a “sentinel” value meaning “invalid input”.
+
+> Better practice (conceptually): `isinstance(s, str)` rather than `type(s) is str` (supports subclasses too).
+
+---
+
+### Group A3 — Empty string fast-path (base case)
+
+```py
+    if len(s) == 0
+        return 0
+```
+
+**Concept:**
+If the line is empty, it has 0 words.
+
+⚠️ **Bug in your code:** missing `:`
+It must be:
+
+```py
+if len(s) == 0:
+```
+
+---
+
+### Group A4 — State-machine setup (IN/OUT word detection)
+
+```py
+    IN, OUT = 1, 2
+    currentState = OUT
+    w_cnt = 0
+```
+
+**Concept:**
+This is the classic **finite state machine** approach for word counting.
+
+* `OUT` = currently not inside a word
+* `IN`  = currently inside a word
+* `currentState` starts at `OUT` because before scanning, we haven’t seen a word yet
+* `w_cnt` is an accumulator for number of words found
+
+---
+
+### Group A5 — Character scan loop
+
+```py
+    for c in s:
+```
+
+**Concept:**
+Iterates character-by-character, making it easy to detect word boundaries using whitespace.
+
+---
+
+### Group A6 — Transition OUT → IN (start of a word)
+
+```py
+        if currentState is OUT and c.isspace() is False:
+            currentState = IN
+            w_cnt = w_cnt + 1
+```
+
+**Concept:**
+A word starts when:
+
+* you were previously `OUT` of a word, and
+* the current character is **not whitespace**
+
+So:
+
+* change state to `IN`
+* increment word count (we found a new word)
+
+⚠️ Conceptual improvement:
+
+* Use `==` instead of `is` for value comparison (`is` checks identity).
+* Use `not c.isspace()` instead of `c.isspace() is False`.
+
+---
+
+### Group A7 — Transition IN → OUT (end of a word)
+
+```py
+        elif currentState is IN and c.isspace() is True:
+            currentState = OUT
+```
+
+**Concept:**
+A word ends when you are `IN` a word and you hit whitespace. So you switch back to `OUT`.
+
+(Again: `==` and `not/isspace()` style is cleaner.)
+
+---
+
+### Group A8 — Return final count
+
+```py
+    return w_cnt
+```
+
+**Concept:**
+After scanning the entire string, `w_cnt` holds the number of detected word-starts → the word count.
+
+---
+
+## B) File-processing pattern (count lines, words, characters)
+
+The following blocks repeat the same **pattern**:
+
+* choose a file name
+* initialize counters
+* open file in read mode
+* loop line-by-line
+* update:
+
+  * `line_count` by 1 per line
+  * `word_count` by `get_word_count(line)`
+  * `character_count` by `len(line)` (includes `\n` if present)
+* close file
+* print a tab-separated summary
+
+The separator line is just a visual divider:
+
+```py
+#-----------------------------------------------------------------------
+```
+
+**Concept:** readability / section separation.
+
+---
+
+## Block 0 — counts for `abc.txt`
+
+### Group B0.1 — Select file + init counters
+
+```py
+file_name = 'abc.txt'
+line_count, word_count, character_count = 0, 0, 0
+```
+
+**Concept:**
+
+* `file_name` stores which file to analyze
+* counters are **accumulators** that grow as we read the file
+
+---
+
+### Group B0.2 — Open file for reading
+
+```py
+f_handle = open(file_name, 'r')
+```
+
+**Concept:**
+Opens the file in **read mode** and returns a file object (handle).
+
+---
+
+### Group B0.3 — Iterate lines (file object is an iterator)
+
+```py
+for line in f_handle:
+```
+
+**Concept:**
+Reading line-by-line is memory efficient. Each `line` is a string (usually ends with `\n`).
+
+---
+
+### Group B0.4 — Update counters per line
+
+```py
+    line_count = line_count + 1
+    word_count = word_count + get_word_count(line)
+    character_count = character_count + len(line)
+```
+
+**Concept:**
+
+* `line_count`: counts number of lines read
+* `word_count`: adds words in this line (using your state-machine function)
+* `character_count`: adds number of characters in this line
+  Note: includes newline `\n` if it exists in `line`
+
+---
+
+### Group B0.5 — Close file
+
+```py
+f_handle.close()
+```
+
+**Concept:**
+Releases OS resources tied to the file handle.
+
+---
+
+### Group B0.6 — Print summary
+
+```py
+print(line_count, word_count, character_count, file_name, sep='\t')
+```
+
+**Concept:**
+Prints the results in a **tab-separated** format (like a mini report).
+
+---
+
+## Block 1 — counts for `pqr.txt`
+
+```py
+# 1
+file_name = 'pqr.txt'
+line_count, word_count, character_count = 0, 0, 0
+f_handle = open(file_name, 'r')
+for line in f_handle:
+    line_count = line_count + 1
+    word_count = word_count + get_word_count(line)
+    character_count = character_count + len(line)
+f_handle.close()
+print(line_count, word_count, character_count, file_name, sep='\t')
+```
+
+**Concept:**
+Same algorithm, different input file (`pqr.txt`). This shows the logic is reusable for any file name.
+
+---
+
+## Block 2 — counts for `abc.txt` (minor spacing difference)
+
+```py
+# 2
+file_name = 'abc.txt'
+line_count, word_count, character_count = 0, 0, 0
+f_handle = open(file_name, 'r')
+for line in f_handle:
+    line_count = line_count + 1
+    word_count = word_count + get_word_count(line)
+    character_count = character_count  + len(line)
+f_handle.close()
+print(line_count, word_count, character_count, file_name, sep='\t')
+```
+
+**Concept:**
+Identical logic; only difference is extra spacing here:
+
+```py
+character_count = character_count  + len(line)
+```
+
+That has **no effect** on execution.
+
+---
+
+## Block 3 — counts for `abc.txt`
+
+```py
+#3
+file_name = 'abc.txt'
+line_count, word_count, character_count = 0, 0, 0
+f_handle = open(file_name, 'r')
+for line in f_handle:
+    line_count = line_count + 1
+    word_count = word_count + get_word_count(line)
+    character_count = character_count + len(line)
+f_handle.close()
+print(line_count, word_count, character_count, file_name, sep='\t')
+```
+
+**Concept:**
+Again same pattern. This shows repetition/duplication (could be refactored).
+
+---
+
+## Block 4 — counts for `abc.txt`
+
+```py
+#4
+file_name = 'abc.txt'
+line_count, word_count, character_count = 0, 0, 0
+f_handle = open(file_name, 'r')
+for line in f_handle:
+    line_count = line_count + 1
+    word_count = word_count + get_word_count(line)
+    character_count = character_count + len(line)
+f_handle.close()
+print(line_count, word_count, character_count, file_name, sep='\t')
+```
+
+**Concept:**
+Same as above. Demonstrates the same I/O + accumulator pattern again.
+
+---
+
+## Block 5 — counts for `abc.txt`
+
+```py
+#5
+file_name = 'abc.txt'
+line_count, word_count, character_count = 0, 0, 0
+f_handle = open(file_name, 'r')
+for line in f_handle:
+    line_count = line_count + 1
+    word_count = word_count + get_word_count(line)
+    character_count = character_count + len(line)
+f_handle.close()
+print(line_count, word_count, character_count, file_name, sep='\t')
+```
+
+**Concept:**
+Same pattern repeated.
+
+---
+
+## C) The “big picture” concept (what this whole program is doing)
+
+**This is basically a simplified `wc` (word count) utility:**
+
+* `line_count`  → number of lines
+* `word_count`  → number of words (using a state machine)
+* `character_count` → number of characters (including newlines)
+* printed per file as a report row
+
+---
+
+## D) Important issues + best-practice notes (directly related to your code)
+
+1. **Syntax error**
+
+* `if len(s) == 0` needs `:`.
+
+2. **`is` vs `==`**
+
+* `currentState is OUT` should be `currentState == OUT` (identity vs equality).
+
+3. **Whitespace checks**
+
+* Prefer `not c.isspace()` over `c.isspace() is False`.
+
+4. **File handling**
+
+* Prefer:
+
+  ```py
+  with open(file_name, 'r') as f_handle:
+      ...
+  ```
+
+  so the file closes automatically even if an error happens.
+
+5. **Repeated blocks**
+
+* Blocks #0, #2, #3, #4, #5 are essentially duplicates → can be refactored into a function that accepts `file_name`.
+
+If you want, I can rewrite this into a clean **single-loop version** that processes a list like `['abc.txt','pqr.txt', ...]` and prints one report line per file (same output format).
+ 

@@ -1,0 +1,261 @@
+Below, I’ve rewritten **each version exactly into properly indented Python**, then explained it by **grouping lines by concept**. I also point out **what breaks** in the buggy versions.
+
+---
+
+## Core concept used in all versions: Finite State Machine (FSM)
+
+You scan the string character-by-character and keep a **state**:
+
+* **OUT** = you are currently *outside* a word (in whitespace zone)
+* **IN** = you are currently *inside* a word (reading non-whitespace)
+
+A **new word is counted only when you transition from OUT → IN**.
+
+`c.isspace()` is the key test:
+
+* `True`  → whitespace (space, tab, newline, etc.)
+* `False` → part of a word
+
+---
+
+# ✅ Version #1 (first one): Works (logic is correct)
+
+```python
+def get_word_count(s: str) -> int:
+    # 1) Input validation
+    if type(s) is not str:
+        return -1
+
+    # 2) Empty string quick exit
+    if len(s) == 0:
+        return 0
+
+    # 3) FSM state constants + initialization
+    IN, OUT = 1, 2
+    currentState = OUT
+    w_cnt = 0
+
+    # 4) Scan characters and count OUT -> IN transitions
+    for c in s:
+        if currentState is OUT and c.isspace() is False:
+            currentState = IN
+            w_cnt = w_cnt + 1
+        elif currentState is IN and c.isspace() is True:
+            currentState = OUT
+
+    # 5) Final answer
+    return w_cnt
+```
+
+### Grouped concepts (covers all lines)
+
+1. **Signature + return type**: `def ... -> int`
+2. **Type checking**: reject non-`str` by returning `-1`
+3. **Empty string handling**: if length is 0 → 0 words
+4. **FSM setup**: define states, start OUT, counter = 0
+5. **Main scan loop**:
+
+   * OUT + non-space → IN and increment count
+   * IN + space → go back to OUT
+6. **Return**: `w_cnt`
+
+> Style note (not a bug): using `is` with numbers/bools is not recommended; `==` / `!=` is safer and idiomatic.
+
+---
+
+# ❌ Version #1 (second one): Has **2 serious logic issues**
+
+```python
+def get_word_count(s: str) -> int:
+    # 1) Input validation
+    if type(s) is not str:
+        return -1
+
+    # 2) Empty string check (BUG: uses 'is')
+    if len(s) is 0:
+        return 0
+
+    # 3) FSM setup
+    IN, OUT = 1, 2
+    currentState = OUT
+    w_cnt = 0
+
+    # 4) Scan loop
+    for c in s:
+        if currentState is OUT and c.isspace() is False:
+            currentState = IN
+            w_cnt = w_cnt + 1
+        elif currentState is IN and c.isspace() is True:
+            currentState = IN   # BUG: should become OUT
+
+    return w_cnt
+```
+
+### What breaks (covers the buggy lines)
+
+* **Bug 1:** `len(s) is 0`
+
+  * `is` checks *object identity*, not equality. Correct is `len(s) == 0` (or `if not s:`).
+* **Bug 2:** On whitespace, it does `currentState = IN`
+
+  * You never leave IN, so you count **only the first word** and ignore later words.
+
+Example: `"hi there you"` → this version returns **1**, not 3.
+
+---
+
+# ❌ Version #2: Crashes (NameError) due to a typo
+
+```python
+def get_word_count(s: str) -> int:
+    # 1) Input validation
+    if type(s) is not str:
+        return -1
+
+    # 2) Empty string
+    if len(s) == 0:
+        return 0
+
+    # 3) FSM setup
+    IN, OUT = 1, 2
+    currentState = OUT
+    w_cnt = 0
+
+    # 4) Scan loop
+    for c in s:
+        if currentState is OUT and c.isspace() is False:
+            currentState = IN
+            w_cnt = w_cnt + 1
+        elif currentstate is IN and c.isspace() is True:  # BUG: currentstate vs currentState
+            currentState = OUT
+
+    return w_cnt
+```
+
+### What breaks
+
+* `currentstate` is **not defined** (Python is case-sensitive).
+  As soon as the loop reaches the `elif`, you get **NameError**.
+
+---
+
+# ✅ Version #3: Works (logic correct)
+
+```python
+def get_word_count(s: str) -> int:
+    # 1) Input validation
+    if type(s) != str:
+        return -1
+
+    # 2) Empty string
+    if len(s) == 0:
+        return 0
+
+    # 3) FSM setup
+    IN, OUT = 1, 2
+    currentState = OUT
+    w_cnt = 0
+
+    # 4) Scan loop
+    for c in s:
+        if currentState is OUT and c.isspace() is False:
+            currentState = IN
+            w_cnt = w_cnt + 1
+        elif currentState is IN and c.isspace() is True:
+            currentState = OUT
+
+    return w_cnt
+```
+
+### Notes
+
+* Same FSM logic as the good #1.
+* `type(s) != str` is functionally similar to `type(s) is not str` (both are strict type checks).
+
+---
+
+# ✅ Version #4: Same as #3 (also works)
+
+```python
+def get_word_count(s: str) -> int:
+    if type(s) != str:
+        return -1
+    if len(s) == 0:
+        return 0
+    IN, OUT = 1, 2
+    currentState = OUT
+    w_cnt = 0
+    for c in s:
+        if currentState is OUT and c.isspace() is False:
+            currentState = IN
+            w_cnt = w_cnt + 1
+        elif currentState is IN and c.isspace() is True:
+            currentState = OUT
+    return w_cnt
+```
+
+Conceptually identical grouping as Version #3.
+
+---
+
+# ❌ Version #5: Syntax error (missing colon / newline)
+
+As written, this part is invalid Python:
+
+```python
+if len(s) == 0
+   return 0
+```
+
+### Corrected version (keeping your intended logic)
+
+```python
+def get_word_count(s: str) -> int:
+    # 1) Input validation
+    if type(s) is not str:
+        return -1
+
+    # 2) Empty string (FIXED syntax)
+    if len(s) == 0:
+        return 0
+
+    # 3) FSM setup
+    IN, OUT = 1, 2
+    currentState = OUT
+    w_cnt = 0
+
+    # 4) Scan loop
+    for c in s:
+        if currentState is OUT and c.isspace() is False:
+            currentState = IN
+            w_cnt = w_cnt + 1
+        elif currentState is IN and c.isspace() is True:
+            currentState = OUT
+
+    return w_cnt
+```
+
+---
+
+## Best-practice version (same FSM, more Pythonic + safer comparisons)
+
+```python
+def get_word_count(s: str) -> int:
+    if not isinstance(s, str):
+        return -1
+
+    IN, OUT = 1, 2
+    state = OUT
+    count = 0
+
+    for ch in s:
+        if state == OUT and not ch.isspace():
+            state = IN
+            count += 1
+        elif state == IN and ch.isspace():
+            state = OUT
+
+    return count
+```
+
+If you want, I can also give you a **small dry-run trace** (state transitions) for an input like: `"  hi   there\nbro  "` to show exactly when the counter increments.
