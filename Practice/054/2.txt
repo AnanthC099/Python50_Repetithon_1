@@ -1,0 +1,179 @@
+Below is your code **grouped line-by-line**, with the **concept behind each group**, and a **dry run** so every line is covered.
+
+---
+
+## Group 1 — Global state (shared output bucket)
+
+```python
+global_list = []
+```
+
+**Concepts**
+
+* **Global variable**: `global_list` lives at module (file) scope.
+* **Mutable object**: it’s a list, so you can keep appending to it.
+* No `global` keyword is needed inside the function because you are **mutating** the list (calling `.append()`), not **rebinding** the name `global_list`.
+
+---
+
+## Group 2 — Recursive “flatten” function definition
+
+```python
+def add(container):
+```
+
+**Concepts**
+
+* Function `add` takes one argument `container`.
+* Intended meaning: “take a (possibly nested) container and collect all atomic (non-iterable) values into `global_list`”.
+
+---
+
+### Group 2A — Loop through the container
+
+```python
+    for x in container:
+```
+
+**Concepts**
+
+* Uses the **iteration protocol** (`for` calls `iter(container)` then repeatedly calls `next()`).
+* Assumes `container` itself is iterable (tuple/list/etc.).
+
+---
+
+### Group 2B — Decide whether `x` should be expanded (recurse) or collected (append)
+
+```python
+        if '__iter__' in dir(type(x)):
+            add(x)
+        else:
+            global_list.append(x)
+```
+
+**Concepts**
+
+* `type(x)` gets the class of `x` (e.g., `int`, `tuple`, `list`).
+* `dir(type(x))` lists attribute names on that class.
+* Checking ` '__iter__' in ...` is a **heuristic** for “is this thing iterable?”
+
+  * If **iterable** → treat it as another container and **recurse**: `add(x)`
+  * If **not iterable** → treat it as an “atomic” element and **collect** it: `global_list.append(x)`
+* This is classic **recursion**:
+
+  * **Recursive case**: iterable element → call `add(x)`
+  * **Base case**: non-iterable element → append it
+
+---
+
+## Group 3 — Show the initial state
+
+```python
+print(global_list)
+```
+
+**Concepts**
+
+* Prints before any processing.
+* At this point, `global_list` is still the empty list `[]`.
+
+So output here is:
+
+```text
+[]
+```
+
+---
+
+## Group 4 — Input data: nested containers
+
+```python
+T = (10, 20, (30, 40, (50, 60), 70), [(100, 200, 300), (400, 500)])
+```
+
+**Concepts**
+
+* `T` is a **tuple** that contains:
+
+  * integers (`10`, `20`)
+  * a nested tuple `(30, 40, (50, 60), 70)`
+  * a nested list `[(100, 200, 300), (400, 500)]`
+* This mix is useful to test whether your function flattens **across different container types**.
+
+---
+
+## Group 5 — Run the flattening
+
+```python
+add(T)
+```
+
+**Concepts**
+
+* Starts recursion from the top-level tuple `T`.
+* Every nested iterable found (tuple/list inside) is expanded until only non-iterables remain.
+
+---
+
+## Group 6 — Show final collected result
+
+```python
+print(global_list)
+```
+
+**Concepts**
+
+* Prints the final flattened output (in the order elements are visited).
+
+For your `T`, the final list becomes:
+
+```text
+[10, 20, 30, 40, 50, 60, 70, 100, 200, 300, 400, 500]
+```
+
+---
+
+# Dry run (what gets appended, in order)
+
+Traversal order is depth-first:
+
+* From `T`:
+
+  * `10` → append
+  * `20` → append
+  * `(30, 40, (50, 60), 70)` → recurse
+
+    * `30` append
+    * `40` append
+    * `(50, 60)` recurse
+
+      * `50` append
+      * `60` append
+    * `70` append
+  * `[(100, 200, 300), (400, 500)]` → recurse
+
+    * `(100, 200, 300)` recurse → append `100, 200, 300`
+    * `(400, 500)` recurse → append `400, 500`
+
+---
+
+# Important interview notes / pitfalls in THIS exact approach
+
+Your iterable test:
+
+```python
+'__iter__' in dir(type(x))
+```
+
+works for tuples/lists, but has side effects:
+
+* **Strings and bytes are iterable**, so this would recurse into them character-by-character.
+* **Dictionaries are iterable** (over keys), so it would flatten keys unless you special-case it.
+* Some objects can be “iterable” in surprising ways.
+
+If the goal is “flatten nested lists/tuples of numbers”, in interviews you usually add a guard like:
+
+* “Treat `str` and `bytes` as atomic”
+* Or “Only recurse into (list, tuple)”
+
+If you want, I can rewrite this into a more interview-safe version (same idea, but avoids strings/dicts and avoids self-referential recursion traps).
