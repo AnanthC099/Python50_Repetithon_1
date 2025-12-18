@@ -12,6 +12,7 @@ id(L1)
 2339489160320
 id(L2)
 2339489160320
+
 #-------------------------
 # Mutable objects can be cloned explicitly.
 # Implicit cloning
@@ -29,6 +30,8 @@ m == n
 True
 m is n
 False
+#-------------------------
+
 # Explicit cloning using copy method
 L = [10, 20, 30]
 L1 = L.copy()
